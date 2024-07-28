@@ -1,10 +1,11 @@
 import streamlit as st
 import pandas as pd
+import plotly.graph_objects as go
 
 
 # STREAMLIT Page setup ----------------------
 
-st.set_page_config(layout="centered",
+st.set_page_config(layout="wide",
                    page_title="PiwikPro Realtime Analytics")
 
 
@@ -33,7 +34,7 @@ st.sidebar.markdown(
     "[Github](https://github.com/jvanalytics)", unsafe_allow_html=True)
 
 
-# STREALIT Data
+# STREAMLIT Data
 
 
 filepath = 'data_set_da_test.csv'
@@ -55,16 +56,6 @@ purchase_df = df[df['event_type'] == 'order']
 purchase_sessions = purchase_df['session'].nunique()
 
 
-st.header("Metrics")
-st.metric("Total Sessions", total_sessions)
-st.metric("Interested User Sessions", interested_sessions)
-st.metric("Add to Cart Sessions", add_to_cart_sessions)
-st.metric("Purchase Sessions", purchase_sessions)
-
-
-st.header("Conversion Funnel Metrics")
-
-
 session_cr = round(purchase_sessions/total_sessions*100, 2)
 
 add_to_cart_rate = round(add_to_cart_sessions/total_sessions*100, 2)
@@ -73,6 +64,38 @@ cart_abandonment_rate = round(
     (add_to_cart_sessions-purchase_sessions)/add_to_cart_sessions*100, 2)
 
 
-st.metric("Session Conversion Rate", session_cr)
-st.metric("Add to Cart Rate", add_to_cart_rate)
-st.metric("Cart Abandonment Rate", cart_abandonment_rate)
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    st.metric("Total Sessions", total_sessions)
+    st.metric("Session Conversion Rate", f'{session_cr} %')
+
+
+with col2:
+    st.metric("Interested User Sessions", interested_sessions)
+    st.metric("Add to Cart Rate", f'{add_to_cart_rate} %')
+
+
+with col3:
+    st.metric("Add to Cart Sessions", add_to_cart_sessions)
+    st.metric("Cart Abandonment Rate", f'{cart_abandonment_rate} %')
+
+with col4:
+    st.metric("Purchase Sessions", purchase_sessions)
+
+
+# Main Funnel visualization
+
+stages = ['Total Sessions', 'Interested Sessions',
+          'Add to Cart Sessions', 'Purchase Sessions']
+values = [total_sessions, interested_sessions,
+          add_to_cart_sessions, purchase_sessions]
+
+fig = go.Figure(go.Funnel(
+    y=stages,
+    x=values,
+    textinfo="value+percent initial"
+))
+
+
+st.plotly_chart(fig)
