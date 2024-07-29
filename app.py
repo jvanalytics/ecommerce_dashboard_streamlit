@@ -85,7 +85,7 @@ filepath = 'data_set_da_test.csv'
 
 df = pd.read_csv(filepath)
 
-sql_df = df  # use for sql exercises
+# sql_df = df  # use for sql exercises
 
 total_sessions = df[scope].nunique()
 
@@ -105,6 +105,7 @@ purchase_sessions = purchase_df[scope].nunique()
 
 # 1st page type visited in each session
 df['event_date'] = pd.to_datetime(df['event_date'])
+
 df_sorted = df.sort_values(by=[scope, 'event_date'])
 first_page_type_df = df_sorted.groupby(scope).first().reset_index()[
     [scope, 'page_type']]
@@ -263,45 +264,44 @@ with tab1:
 
     st.plotly_chart(fig)
 
-    st.divider()
+    # st.divider()
 
-    st.subheader("Top 50 Products Added to Cart")
-    # Calculate the number of unique products added to the cart per product
+    # REMOVED DUE TO BEING HEAVY PROCESSING
 
-    df_product_overall_top_atc = df_first[df_first['event_type'] == 'add_to_cart'].groupby(
-        'product')[scope].nunique().reset_index(name=f'Add to Cart {scope.capitalize()}s')
+    # st.subheader("Top 50 Products Added to Cart")
+    # # Calculate the number of unique products added to the cart per product
 
-    df_product_pageview_top_atc = df_first[(df_first['event_type'] == 'add_to_cart') & (df_first['page_type_first'] == 'product_page')].groupby(
-        'product')[scope].nunique().reset_index(name=f'Product Page Add to Cart {scope.capitalize()}s')
+    # df_product_overall_top_atc = df_first[df_first['event_type'] == 'add_to_cart'].groupby(
+    #     'product')[scope].nunique().reset_index(name=f'Add to Cart {scope.capitalize()}s')
 
-    df_product_listing_top_atc = df_first[(df_first['event_type'] == 'add_to_cart') & (df_first['page_type_first'] == 'listing_page')].groupby(
-        'product')[scope].nunique().reset_index(name=f'Listing Page Add to Cart {scope.capitalize()}s')
+    # df_product_pageview_top_atc = df_first[(df_first['event_type'] == 'add_to_cart') & (df_first['page_type_first'] == 'product_page')].groupby(
+    #     'product')[scope].nunique().reset_index(name=f'Product Page Add to Cart {scope.capitalize()}s')
 
-    df_product_search_listing_atc = df_first[(df_first['event_type'] == 'add_to_cart') & (df_first['page_type_first'] == 'search_listing_page')].groupby(
-        'product')[scope].nunique().reset_index(name=f'Search Listing Page Add to Cart {scope.capitalize()}s')
+    # df_product_listing_top_atc = df_first[(df_first['event_type'] == 'add_to_cart') & (df_first['page_type_first'] == 'listing_page')].groupby(
+    #     'product')[scope].nunique().reset_index(name=f'Listing Page Add to Cart {scope.capitalize()}s')
 
-    merged_product_df = df_product_overall_top_atc.merge(
-        df_product_pageview_top_atc, on='product', how='outer'
+    # df_product_search_listing_atc = df_first[(df_first['event_type'] == 'add_to_cart') & (df_first['page_type_first'] == 'search_listing_page')].groupby(
+    #     'product')[scope].nunique().reset_index(name=f'Search Listing Page Add to Cart {scope.capitalize()}s')
 
-    ).merge(
-        df_product_listing_top_atc, on='product', how='outer'
+    # merged_product_df = df_product_overall_top_atc.merge(
+    #     df_product_pageview_top_atc, on='product', how='outer'
 
-    ).merge(
-        df_product_search_listing_atc, on='product', how='outer'
-    )
+    # ).merge(
+    #     df_product_listing_top_atc, on='product', how='outer'
 
-    df['product'] = df['product'].astype('string')
+    # ).merge(
+    #     df_product_search_listing_atc, on='product', how='outer'
+    # )
 
-    top_50_products = merged_product_df.sort_values(
-        by=merged_product_df.columns[1], ascending=False).head(50)
+    # df['product'] = df['product'].astype('string')
 
-    st.dataframe(top_50_products)
+    # top_50_products = merged_product_df.sort_values(
+    #     by=merged_product_df.columns[1], ascending=False).head(50)
+
+    # st.dataframe(top_50_products)
 
 
 # second part of exercise (SQL Queries)
-
-# ensure datetime format
-sql_df['event_date'] = pd.to_datetime(sql_df['event_date'])
 
 
 with tab2:
@@ -311,24 +311,24 @@ with tab2:
     query = """
     WITH first_sessions AS (
         SELECT user, MIN(session) AS first_session
-        FROM sql_df
+        FROM df
         GROUP BY user
     ),
     first_session_products AS (
-        SELECT sql_df.*
-        FROM sql_df
+        SELECT df.*
+        FROM df
         JOIN first_sessions
-        ON sql_df.user = first_sessions.user
-        AND sql_df.session = first_sessions.first_session
-        WHERE sql_df.page_type = 'product_page'
+        ON df.user = first_sessions.user
+        AND df.session = first_sessions.first_session
+        WHERE df.page_type = 'product_page'
     ),
     next_sessions AS (
-        SELECT DISTINCT sql_df.user
-        FROM sql_df
+        SELECT DISTINCT df.user
+        FROM df
         JOIN first_sessions
-        ON sql_df.user = first_sessions.user
-        WHERE sql_df.session != first_sessions.first_session
-        AND sql_df.page_type = 'product_page'
+        ON df.user = first_sessions.user
+        WHERE df.session != first_sessions.first_session
+        AND df.page_type = 'product_page'
     ),
     users_only_first_session_products AS (
         SELECT first_session_products.user
@@ -382,7 +382,7 @@ with tab3:
         user,
         COUNT(*) AS total_sessions,
         COUNT(DISTINCT page_type) AS page_types_visited
-    FROM sql_df
+    FROM df
     GROUP BY user
     ),
     avg_values AS (
@@ -400,7 +400,7 @@ with tab3:
         ELSE 'Normal'
     END AS abnormal_behavior
     FROM user_summary, avg_values
-    LIMIT 100000 -- limited to 100k rows to be lighter after dataframe creation
+    LIMIT 30000 -- limited to 30K rows to be lighter on performance after dataframe creation
     """
 
     st.code(second_query, language="sql")
