@@ -412,7 +412,8 @@ with tab3:
     if st.button("Toggle Abnormal Only"):
         second_query_df = second_query_result[second_query_result['abnormal_behavior']
                                               == 'Abnormal Session Count']
-    else:
-        second_query_df = second_query_result
 
-    st.dataframe(second_query_df)
+        st.dataframe(second_query_df)
+
+    else:
+        st.dataframe(second_query_result)
