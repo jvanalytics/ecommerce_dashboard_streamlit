@@ -187,14 +187,14 @@ cart_abandonment_rate = round(
 st.subheader("Insights")
 
 if page_type == None:
-    st.caption(
+    st.markdown(
         r"""
     Almost 100% of result in some but only 3% result in add to cart. However it has a very high overall cart conversion rate of 71.6% which indicates good product and shopping experience after adding to cart.
 
 """
     )
 elif page_type == "Search Listing Page":
-    st.caption(
+    st.markdown(
         r"""
     Only 4% of sessions result in a user making first a session. Also, only 6.8% of those add a product to cart which indicates search might need to be improved or experiment giving it higher visibility when a user accesses the website/app.
 """
@@ -202,7 +202,7 @@ elif page_type == "Search Listing Page":
 
 
 elif page_type == "Listing Page":
-    st.caption(
+    st.markdown(
         r"""
     Users access first the Listing Page in 52% of sessions which should indicate that menu and category structures and visibility should be good.
     However, considering that users can add products through the listing page,less that 1% actually do it.
@@ -212,7 +212,7 @@ elif page_type == "Listing Page":
 
 
 elif page_type == "Product Page":
-    st.caption(
+    st.markdown(
         r"""
     Users access Product Page 48% of sessions, which is also a good indicator of its easy discovery.
     It is also the main way of adding products to the cart (3%) and then purchase (1%).
