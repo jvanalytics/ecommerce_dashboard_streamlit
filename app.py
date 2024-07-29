@@ -239,8 +239,8 @@ with tab1:
                       f'{session_cr} %')
 
         with col3:
-            st.metric(f"Add to Cart {
-                      scope.capitalize()}s", add_to_cart_sessions)
+            st.metric(f"Add to Cart {scope.capitalize()}s",
+                      add_to_cart_sessions)
             st.metric("Cart Abandonment Rate", f'{cart_abandonment_rate} %')
 
         st.divider()
@@ -373,8 +373,8 @@ with tab3:
 
         st.markdown(
             """Here we are trying to analyze traffic outliers (abnormal session counts). 
-            Ideally I would prefer to consider any traffic that goes beyond a certain percentile (like 75th or 95th percentile).
-            However the pandasql library uses SQLite and we cannot perform percentile calculation. 
+            Ideally I would prefer to consider any traffic count that goes beyond a certain percentile (like 75th or 95th percentile).
+            However the pandasql library uses SQLite and we cannot perform percentile calculation with it. 
             So in that case I made it a bit more interactive by calculating the average session count per user and calculate the abnormal values based on a user input multiplier that you can change.
             This query can also be adapted to detect abnormal event actions like add to cart or purchase or even session duration.
             """""
